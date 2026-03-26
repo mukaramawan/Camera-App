@@ -2,6 +2,11 @@
   "expo": {
     "name": "Camera-App",
     "slug": "Camera-App",
+    "scheme": "mukaram-camera",
+    "experiments": {
+      "typedRoutes": true,
+      "srcDir": "src"
+    },
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -24,7 +29,9 @@
       "predictiveBackGestureEnabled": false
     },
     "web": {
-      "favicon": "./assets/favicon.png"
-    }
+      "favicon": "./assets/favicon.png",
+      "bundler": "metro"
+    },
+    "plugins": ["expo-router"]
   }
 }
