@@ -1,8 +1,10 @@
 import React, { useEffect, useRef, useState } from "react";
-import { View, ActivityIndicator, StyleSheet, Pressable, Image } from "react-native";
+import { View, ActivityIndicator, StyleSheet, Pressable, Image, Button } from "react-native";
 import { router } from "expo-router";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { File, Directory, Paths } from 'expo-file-system';
+
 import {
-  Camera,
   CameraCapturedPicture,
   CameraType,
   CameraView,
@@ -35,19 +37,41 @@ export default function CameraScreen() {
     router.push("/");
   };
 
-  // FIX: Properly closed the function and updated the state
   const handleCapture = async () => {
     if (cameraRef.current) {
       const capturedPicture = await cameraRef.current.takePictureAsync();
       console.log(capturedPicture);
-      setPicture(capturedPicture);
+      setPicture(capturedPicture || null);
     }
+  };
+
+  const saveFile = async (uri: string) => {
+    const destinationUri = Paths.document;
+    console.log("Copying from:", uri);
+    console.log("Copying to:", destinationUri);
+
+    // Performing the copy operation from cached location to Document Directory
+    const file = new File(uri).copy(destinationUri);
+
+    console.log("File successfully saved to Document Directory!", file);
+    setPicture(null);
+    router.push("/");
   };
 
   if (picture) {
     return (
       <View style={{ flex: 1 }}>
         <Image source={{ uri: picture.uri }} style={styles.capturedImage} />
+
+        <View style={{ padding: 10, position: "absolute", bottom: 20, width: "100%" }}>
+          <SafeAreaView edges={['bottom']}>
+            <Button
+              title="Save"
+              onPress={() => saveFile(picture.uri)}
+            />
+          </SafeAreaView>
+        </View>
+
         <AntDesign
           style={styles.closeButton}
           name="close"
@@ -59,10 +83,8 @@ export default function CameraScreen() {
     );
   }
 
-  // FIX: This return is now correctly at the component level
   return (
     <View style={styles.container}>
-      {/* FIX: Attached the ref here */}
       <CameraView style={styles.camera} facing={facing} ref={cameraRef} />
       
       <AntDesign
@@ -88,7 +110,6 @@ export default function CameraScreen() {
   );
 }
 
-// FIX: Moved styles outside the component to prevent re-creation on every render
 const styles = StyleSheet.create({
   container: {
     flex: 1,
